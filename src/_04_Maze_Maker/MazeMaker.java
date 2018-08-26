@@ -29,22 +29,23 @@ public class MazeMaker {
 	// 6. Complete the selectNextPathMethod
 	private static void selectNextPath(Cell currentCell) {
 		// A. mark cell as visited
+		System.out.println("called");
 		currentCell.setBeenVisited(true);
 		// B. check for unvisited neighbors using the cell
-		if (MazeMaker.getUnvisitedNeighbors(currentCell).size() < 1) {
+		System.out.println(MazeMaker.getUnvisitedNeighbors(currentCell).size());
+		if (MazeMaker.getUnvisitedNeighbors(currentCell).size() > 0) {
+			System.out.println("also called");
 			int wCell = randGen.nextInt(MazeMaker.getUnvisitedNeighbors(currentCell).size());
 			uncheckedCells.push(MazeMaker.getUnvisitedNeighbors(currentCell).get(wCell));
-			if (getUnvisitedNeighbors(currentCell).get(wCell)
-					.equals(maze.cells[currentCell.getX() + 1][currentCell.getY()])) {
-				currentCell.setWestWall(false);
-			}
-			if (getUnvisitedNeighbors(currentCell).get(wCell)
-					.equals(maze.cells[currentCell.getX() - 1][currentCell.getY()])) {
-				currentCell.setEastWall(false);
-			}
-			if (getUnvisitedNeighbors(currentCell).get(wCell)
-					.equals(maze.cells[currentCell.getX() + 1][currentCell.getY()])) {
-				currentCell.setSouthWall(false);
+			removeWalls(MazeMaker.getUnvisitedNeighbors(currentCell).get(wCell), currentCell);
+			currentCell = MazeMaker.getUnvisitedNeighbors(currentCell).get(wCell);
+			currentCell.setBeenVisited(true);
+			if (getUnvisitedNeighbors(currentCell).size() == 4) {
+				if (uncheckedCells.isEmpty() == false) {
+					currentCell = uncheckedCells.pop();
+
+				}
+				selectNextPath(currentCell);
 			}
 		}
 
@@ -72,6 +73,27 @@ public class MazeMaker {
 	// This method will check if c1 and c2 are adjacent.
 	// If they are, the walls between them are removed.
 	private static void removeWalls(Cell c1, Cell c2) {
+		if (c1.getX() - 1 == c2.getX() && c1.getY() == c2.getY()) {
+			System.out.println("wh");
+			c1.setWestWall(false);
+			c2.setEastWall(false);
+		}
+		if (c1.getX() + 1 == c2.getX() && c1.getY() == c2.getY()) {
+			System.out.println("wh");
+			c1.setEastWall(false);
+			c2.setWestWall(false);
+		}
+		if (c1.getY() - 1 == c2.getY() && c1.getX() == c2.getX()) {
+			System.out.println("wh");
+			c1.setNorthWall(false);
+			c2.setSouthWall(false);
+		}
+
+		if (c1.getY() + 1 == c2.getY() && c1.getX() == c2.getX()) {
+			System.out.println("wh");
+			c1.setSouthWall(false);
+			c2.setNorthWall(false);
+		}
 
 	}
 
@@ -80,17 +102,25 @@ public class MazeMaker {
 	// to the ArrayList
 	private static ArrayList<Cell> getUnvisitedNeighbors(Cell c) {
 		ArrayList<Cell> a = new ArrayList<Cell>();
-		if (maze.cells[c.getX() + 1][c.getY()].hasBeenVisited()) {
-			a.add(maze.cells[c.getX() + 1][c.getY()]);
+		if (c.getX() < width - 1) {
+			if (!maze.cells[c.getX() + 1][c.getY()].hasBeenVisited()) {
+				a.add(maze.cells[c.getX() + 1][c.getY()]);
+			}
 		}
-		if (maze.cells[c.getX()][c.getY() + 1].hasBeenVisited()) {
-			a.add(maze.cells[c.getX()][c.getY() + 1]);
+		if (c.getY() < height - 1) {
+			if (!maze.cells[c.getX()][c.getY() + 1].hasBeenVisited()) {
+				a.add(maze.cells[c.getX()][c.getY() + 1]);
+			}
 		}
-		if (maze.cells[c.getX()][c.getY() - 1].hasBeenVisited()) {
-			a.add(maze.cells[c.getX()][c.getY() - 1]);
+		if (c.getY() > 0) {
+			if (!maze.cells[c.getX()][c.getY() - 1].hasBeenVisited()) {
+				a.add(maze.cells[c.getX()][c.getY() - 1]);
+			}
 		}
-		if (maze.cells[c.getX() - 1][c.getY()].hasBeenVisited()) {
-			a.add(maze.cells[c.getX() - 1][c.getY()]);
+		if (c.getX() > 0) {
+			if (!maze.cells[c.getX() - 1][c.getY()].hasBeenVisited()) {
+				a.add(maze.cells[c.getX() - 1][c.getY()]);
+			}
 		}
 		return a;
 	}
